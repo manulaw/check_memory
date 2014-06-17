@@ -10,6 +10,7 @@ STATE_OK=0
 STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
+
 # print usage
 if [[ $# -lt 4 ]]
 then
@@ -35,6 +36,7 @@ while [[ $# -gt 0 ]]
         esac
         shift
   done
+
 # verify input
 if [[ $warning -eq $critical || $warning -lt $critical ]]
 then
@@ -46,11 +48,12 @@ then
         exit 0
 fi
 # Total memory available
-total=`free -m | head -2 |tail -1 |gawk '{print $2}'`
+total=`free -m | head -2 |tail -1 |awk '{print $2}'`
 # Total memory used
-used=`free -m | head -2 |tail -1 |gawk '{print $3}'`
+used=`free -m | head -3 |tail -1 |awk '{print $3}'`
 # Calc total minus used
-free=`free -m | head -2 |tail -1 |gawk '{print $2-$3}'`
+#free=`free -m | head -2 |tail -1 |awk '{print $2-$3}'`
+free=`free -m | head -3 |tail -1 |awk '{print $4}'`
 # normal values
 #echo "$total"MB total
 #echo "$used"MB used
@@ -64,7 +67,7 @@ echo "$total" >> $calc # division integer
 echo "/" >> $calc # division sign
 echo "*" >> $calc # multiplication sign
 echo "p" >> $calc # print
-percent=`/usr/bin/dc $calc|/bin/sed 's/^\./0./'|/usr/bin/tr "." " "|/usr/bin/gawk {'print $1'}`
+percent=`/usr/bin/dc $calc|/bin/sed 's/^\./0./'|/usr/bin/tr "." " "|/usr/bin/awk {'print $1'}`
 #percent1=`/usr/bin/dc $calc`
 #echo "$percent1"
 if [[ "$percent" -le  $critical ]]
@@ -82,3 +85,4 @@ if [[ "$percent" -gt  $warning ]]
                 echo "OK - $free MB ($percent%) Free Memory"
                 exit 0
 fi
+
